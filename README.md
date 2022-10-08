@@ -12,6 +12,24 @@ Build RESTful API of order and items including CRUD operations.
 - [ ] Error handling
 - [x] Dependency injection implementation
 
+## Getting Started
+
+To start running this project locally, you must follow these steps:
+
+First, clone these repository to the your folder.
+
+```
+> https://github.com/mluthfit/go-orders-api.git
+```
+
+Then, open the folder and **install** all packages.
+
+```
+> go mod tidy
+```
+
+Then, adjust the database configuration in `utils/db.go` file.
+
 ## Endpoint
 
 Base URL : `http://localhost:8000`
