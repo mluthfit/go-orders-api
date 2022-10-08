@@ -4,13 +4,13 @@ Build RESTful API of order with items including CRUD operations.
 
 ## Criteria
 
-- [] No error
+- [ ] No error
 - [x] Using `gin-gonic/gin`
 - [x] Using `gorm`
 - [x] Using git
-- [] Using proper HTTP methods
-- [] Error handling
-- [] Dependency injection implementation
+- [ ] Using proper HTTP methods
+- [ ] Error handling
+- [ ] Dependency injection implementation
 
 ## Endpoint
 
