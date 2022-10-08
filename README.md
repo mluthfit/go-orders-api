@@ -30,6 +30,12 @@ Then, open the folder and **install** all packages.
 
 Then, adjust the database configuration in `utils/db.go` file.
 
+Last, start the server.
+
+```
+> go run main.go
+```
+
 ## Endpoint
 
 Base URL : `http://localhost:8000`
