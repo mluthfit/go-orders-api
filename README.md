@@ -10,15 +10,16 @@ Build RESTful API of order and items including CRUD operations.
 - [x] Using git
 - [ ] Using proper HTTP methods
 - [ ] Error handling
-- [ ] Dependency injection implementation
+- [x] Dependency injection implementation
 
 ## Endpoint
+
+Base URL : `http://localhost:8000`
 
 | Route            | HTTP     | Description               |
 | ---------------- | -------- | ------------------------- |
 | /orders          | `GET`    | Get all orders            |
 | /orders          | `POST`   | Create order and items    |
-| /orders/:orderId | `GET`    | Get a order               |
 | /orders/:orderId | `PUT`    | Update a orders and items |
 | /orders/:orderId | `DELETE` | Delete a order            |
 
