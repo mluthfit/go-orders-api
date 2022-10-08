@@ -15,7 +15,7 @@ func (inDB *InDB) GetAllOrders(ctx *gin.Context) {
 		return
 	}
 
-	resSuccess(ctx, http.StatusOK, orders)
+	resSuccess(ctx, http.StatusOK, orders, "the data retrieved successfully")
 }
 
 func (inDB *InDB) CreateOrder(ctx *gin.Context) {
@@ -31,7 +31,7 @@ func (inDB *InDB) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	resSuccess(ctx, http.StatusCreated, order)
+	resSuccess(ctx, http.StatusCreated, order, "the order created successfully")
 }
 
 func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
@@ -60,7 +60,7 @@ func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
 	// 		Updates(item)
 	// }
 
-	resSuccess(ctx, http.StatusOK, order)
+	resSuccess(ctx, http.StatusOK, order, "the order updated successfully")
 }
 
 func (inDB *InDB) DeleteOrderById(ctx *gin.Context) {
@@ -73,5 +73,5 @@ func (inDB *InDB) DeleteOrderById(ctx *gin.Context) {
 	}
 
 	inDB.db.Select("Items").Delete(&order)
-	resSuccess(ctx, http.StatusOK, order)
+	resSuccess(ctx, http.StatusOK, order, "the order deleted successfully")
 }

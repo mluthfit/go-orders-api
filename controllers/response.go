@@ -16,15 +16,16 @@ func resError(ctx *gin.Context, code int, err any) {
 
 	ctx.AbortWithStatusJSON(code, gin.H{
 		"code":    code,
-		"message": message,
 		"errors":  err,
+		"message": message,
 	})
 }
 
-func resSuccess(ctx *gin.Context, code int, data any) {
+func resSuccess(ctx *gin.Context, code int, data any, msg string) {
 	ctx.JSON(code, gin.H{
-		"code": code,
-		"data": data,
+		"code":    code,
+		"data":    data,
+		"message": msg,
 	})
 }
 

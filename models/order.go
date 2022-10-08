@@ -5,8 +5,8 @@ import (
 )
 
 type OrderDefault struct {
-	CustomerName string    `json:"customerName" binding:"required"`
-	OrderedAt    time.Time `json:"orderedAt" binding:"required"`
+	CustomerName string    `json:"customerName" binding:"required" gorm:"not null"`
+	OrderedAt    time.Time `json:"orderedAt" binding:"required" gorm:"not null"`
 }
 
 type Order struct {

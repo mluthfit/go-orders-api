@@ -5,9 +5,9 @@ import (
 )
 
 type ItemDefault struct {
-	ItemCode    string `json:"itemCode" binding:"required,unique"`
-	Description string `json:"description" binding:"required"`
-	Quantity    uint   `json:"quantity" binding:"required,numeric"`
+	ItemCode    string `json:"itemCode" binding:"required" gorm:"unique;not null"`
+	Description string `json:"description" binding:"required" gorm:"not null"`
+	Quantity    uint   `json:"quantity" binding:"required,numeric" gorm:"not null"`
 }
 
 type Item struct {
