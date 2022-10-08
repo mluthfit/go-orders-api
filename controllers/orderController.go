@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (inDB *InDB) GetAllOrders(ctx *gin.Context) {
+func (server *Server) GetAllOrders(ctx *gin.Context) {
 	var orders []models.Order
 
-	if err := inDB.db.Preload("Items").Find(&orders).Error; err != nil {
+	if err := server.db.Preload("Items").Find(&orders).Error; err != nil {
 		resError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -18,7 +18,7 @@ func (inDB *InDB) GetAllOrders(ctx *gin.Context) {
 	resSuccess(ctx, http.StatusOK, orders, "the data retrieved successfully")
 }
 
-func (inDB *InDB) CreateOrder(ctx *gin.Context) {
+func (server *Server) CreateOrder(ctx *gin.Context) {
 	var order models.Order
 
 	if err := ctx.ShouldBindJSON(&order); err != nil {
@@ -26,7 +26,7 @@ func (inDB *InDB) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	if err := inDB.db.Create(&order).Error; err != nil {
+	if err := server.db.Create(&order).Error; err != nil {
 		resError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -34,7 +34,7 @@ func (inDB *InDB) CreateOrder(ctx *gin.Context) {
 	resSuccess(ctx, http.StatusCreated, order, "the order created successfully")
 }
 
-func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
+func (server *Server) UpdateOrderById(ctx *gin.Context) {
 	var order models.Order
 	var payloadOrder models.OrderUpdatePayload
 	var orderId = ctx.Param("orderId")
@@ -44,7 +44,7 @@ func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
 		return
 	}
 
-	if err := inDB.db.First(&order, orderId).Error; err != nil {
+	if err := server.db.First(&order, orderId).Error; err != nil {
 		resError(ctx, http.StatusNotFound, err.Error())
 		return
 	}
@@ -52,10 +52,10 @@ func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
 	order.CustomerName = payloadOrder.CustomerName
 	order.OrderedAt = payloadOrder.OrderedAt
 
-	inDB.db.Save(&order)
+	server.db.Save(&order)
 
 	// for _, item := range payloadOrder.Items {
-	// 	inDB.db.Model(&models.Item{}).Where("item_id = ?", item.LineItemID).
+	// 	server.db.Model(&models.Item{}).Where("item_id = ?", item.LineItemID).
 	// 		Where("order_id = ?", order.OrderID).
 	// 		Updates(item)
 	// }
@@ -63,15 +63,15 @@ func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
 	resSuccess(ctx, http.StatusOK, order, "the order updated successfully")
 }
 
-func (inDB *InDB) DeleteOrderById(ctx *gin.Context) {
+func (server *Server) DeleteOrderById(ctx *gin.Context) {
 	var order models.Order
 	var orderId = ctx.Param("orderId")
 
-	if err := inDB.db.First(&order, orderId).Error; err != nil {
+	if err := server.db.First(&order, orderId).Error; err != nil {
 		resError(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
-	inDB.db.Select("Items").Delete(&order)
+	server.db.Select("Items").Delete(&order)
 	resSuccess(ctx, http.StatusOK, order, "the order deleted successfully")
 }
