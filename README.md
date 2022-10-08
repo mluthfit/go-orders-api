@@ -1,6 +1,6 @@
 # Objective
 
-Build RESTful API of order with items including CRUD operations.
+Build RESTful API of order and items including CRUD operations.
 
 ## Criteria
 
