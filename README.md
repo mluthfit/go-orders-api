@@ -8,8 +8,8 @@ Build RESTful API of order and items including CRUD operations.
 - [x] Using `gin-gonic/gin`
 - [x] Using `gorm`
 - [x] Using git
-- [ ] Using proper HTTP methods
-- [ ] Error handling
+- [x] Using proper HTTP methods
+- [x] Error handling
 - [x] Dependency injection implementation
 
 ## Getting Started

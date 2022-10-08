@@ -11,7 +11,7 @@ func (inDB *InDB) GetAllOrders(ctx *gin.Context) {
 	var orders []models.Order
 
 	if err := inDB.db.Preload("Items").Find(&orders).Error; err != nil {
-		resError(ctx, http.StatusInternalServerError, err)
+		resError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -22,12 +22,12 @@ func (inDB *InDB) CreateOrder(ctx *gin.Context) {
 	var order models.Order
 
 	if err := ctx.ShouldBindJSON(&order); err != nil {
-		resError(ctx, http.StatusBadRequest, err)
+		resError(ctx, http.StatusBadRequest, extractBindError(err))
 		return
 	}
 
 	if err := inDB.db.Create(&order).Error; err != nil {
-		resError(ctx, http.StatusBadRequest, err)
+		resError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -40,12 +40,12 @@ func (inDB *InDB) UpdateOrderById(ctx *gin.Context) {
 	var orderId = ctx.Param("orderId")
 
 	if err := ctx.ShouldBindJSON(&payloadOrder); err != nil {
-		resError(ctx, http.StatusBadRequest, err)
+		resError(ctx, http.StatusBadRequest, extractBindError(err))
 		return
 	}
 
 	if err := inDB.db.First(&order, orderId).Error; err != nil {
-		resError(ctx, http.StatusNotFound, err)
+		resError(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -68,7 +68,7 @@ func (inDB *InDB) DeleteOrderById(ctx *gin.Context) {
 	var orderId = ctx.Param("orderId")
 
 	if err := inDB.db.First(&order, orderId).Error; err != nil {
-		resError(ctx, http.StatusNotFound, err)
+		resError(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
