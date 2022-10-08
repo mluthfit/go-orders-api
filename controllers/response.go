@@ -7,25 +7,28 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func resError(ctx *gin.Context, code int, err any) {
-	var message = "request validation errors"
-	if value, ok := err.(string); ok {
-		message = value
-		err = nil
-	}
+type RequiredResponse struct {
+	code    int
+	message string
+}
 
-	ctx.AbortWithStatusJSON(code, gin.H{
-		"code":    code,
+func NewRequiredResponse() *RequiredResponse {
+	return &RequiredResponse{code: 200}
+}
+
+func resError(ctx *gin.Context, res *RequiredResponse, err any) {
+	ctx.AbortWithStatusJSON(res.code, gin.H{
+		"code":    res.code,
 		"errors":  err,
-		"message": message,
+		"message": res.message,
 	})
 }
 
-func resSuccess(ctx *gin.Context, code int, data any, msg string) {
-	ctx.JSON(code, gin.H{
-		"code":    code,
+func resSuccess(ctx *gin.Context, res *RequiredResponse, data any) {
+	ctx.JSON(res.code, gin.H{
+		"code":    res.code,
 		"data":    data,
-		"message": msg,
+		"message": res.message,
 	})
 }
 
