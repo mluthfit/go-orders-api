@@ -4,7 +4,7 @@ Build RESTful API of order and items including CRUD operations.
 
 ## Criteria
 
-- [ ] No error
+- [x] No error
 - [x] Using `gin-gonic/gin`
 - [x] Using `gorm`
 - [x] Using git

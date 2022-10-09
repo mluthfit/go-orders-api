@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"errors"
 	"go-orders-api/models"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func (server *Server) GetAllOrders(ctx *gin.Context) {
@@ -31,8 +33,14 @@ func (server *Server) CreateOrder(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&order); err != nil {
 		res.code = http.StatusBadRequest
-		res.message = "request validation errors"
-		resError(ctx, res, extractBindError(err))
+		if errors.As(err, &validator.ValidationErrors{}) {
+			res.message = "request validation errors"
+			resError(ctx, res, extractBindError(err))
+			return
+		}
+
+		res.message = err.Error()
+		resError(ctx, res, nil)
 		return
 	}
 
@@ -65,8 +73,14 @@ func (server *Server) UpdateOrderById(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&payloadOrder); err != nil {
 		res.code = http.StatusBadRequest
-		res.message = "request validation errors"
-		resError(ctx, res, extractBindError(err))
+		if errors.As(err, &validator.ValidationErrors{}) {
+			res.message = "request validation errors"
+			resError(ctx, res, extractBindError(err))
+			return
+		}
+
+		res.message = err.Error()
+		resError(ctx, res, nil)
 		return
 	}
 

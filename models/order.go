@@ -69,10 +69,14 @@ func (order *Order) UpdateOrderAndItems(db *gorm.DB, orderId uint, payloadOrder 
 
 	var item Item
 	for _, each := range payloadOrder.Items {
-		if err := tx.First(&item, each.LineItemID).Error; err != nil {
+		if err := tx.Where(Item{
+			OrderID: orderId,
+			ItemID:  each.LineItemID,
+		}).First(&item).
+			Error; err != nil {
 			tx.Rollback()
 			return nil,
-				fmt.Errorf(fmt.Sprintf("the item with line item id %d not found", each.LineItemID))
+				fmt.Errorf(fmt.Sprintf("the item id %d was not found in the order", each.LineItemID))
 		}
 
 		if err := tx.Model(&item).Updates(each).Error; err != nil {
