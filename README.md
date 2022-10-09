@@ -14,6 +14,8 @@ Build RESTful API of order and items including CRUD operations.
 
 ## Getting Started
 
+This project developed using `go 1.19` and `mysql`.
+
 To start running this project locally, you must follow these steps:
 
 First, clone these repository to the your folder.
