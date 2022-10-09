@@ -16,7 +16,7 @@ func NewRequiredResponse() *RequiredResponse {
 	return &RequiredResponse{code: 200}
 }
 
-func resError(ctx *gin.Context, res *RequiredResponse, err any) {
+func resError(ctx *gin.Context, res *RequiredResponse, err map[string][]string) {
 	ctx.AbortWithStatusJSON(res.code, gin.H{
 		"code":    res.code,
 		"errors":  err,

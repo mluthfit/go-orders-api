@@ -1,17 +1,25 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
 )
 
+type OrderUpdatePayload struct {
+	CustomerName string              `json:"customerName" binding:"required"`
+	OrderedAt    *time.Time          `json:"orderedAt" binding:"required"`
+	Items        []ItemUpdatePayload `json:"items"`
+}
+
 type Order struct {
-	OrderID uint `json:"orderId" gorm:"primaryKey"`
-	OrderDefault
-	Items     []Item    `json:"items"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	OrderID      uint       `json:"orderId" gorm:"primaryKey"`
+	CustomerName string     `json:"customerName" binding:"required" gorm:"not null"`
+	OrderedAt    *time.Time `json:"orderedAt" binding:"required" gorm:"not null"`
+	Items        []Item     `json:"items"`
+	CreatedAt    time.Time  `json:"createdAt"`
+	UpdatedAt    time.Time  `json:"updatedAt"`
 }
 
 func (order *Order) GetAllOrdersAndItems(db *gorm.DB) (*[]Order, error) {
@@ -25,19 +33,65 @@ func (order *Order) GetAllOrdersAndItems(db *gorm.DB) (*[]Order, error) {
 	return &orders, nil
 }
 
-func (order *Order) CreateOrderAndItems(db *gorm.DB) {
+func (order *Order) CreateOrderAndItems(db *gorm.DB) (*Order, error) {
+	var tx = db.Begin()
+	if err := tx.Omit("Items").Create(&order).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
 
+	for index := range order.Items {
+		order.Items[index].OrderID = order.OrderID
+		if err := tx.Create(&order.Items[index]).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	tx.Commit()
+	return order, nil
 }
 
-func (order *Order) UpdateOrderAndItems(db *gorm.DB) {
-
-}
-
-func (order *Order) DeleteOrderAndItems(db *gorm.DB, orderId uint) (*Order, error) {
+func (order *Order) UpdateOrderAndItems(db *gorm.DB, orderId uint, payloadOrder OrderUpdatePayload) (*Order, error) {
 	if err := db.First(&order, orderId).Error; err != nil {
 		return nil, err
 	}
 
-	db.Select("Items").Delete(order)
+	var tx = db.Begin()
+	if err := tx.Model(&order).
+		Updates(Order{
+			CustomerName: payloadOrder.CustomerName,
+			OrderedAt:    payloadOrder.OrderedAt,
+		}).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	var item Item
+	for _, each := range payloadOrder.Items {
+		if err := tx.First(&item, each.LineItemID).Error; err != nil {
+			tx.Rollback()
+			return nil,
+				fmt.Errorf(fmt.Sprintf("the item with line item id %d not found", each.LineItemID))
+		}
+
+		if err := tx.Model(&item).Updates(each).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		order.Items = append(order.Items, item)
+	}
+
+	tx.Commit()
+	return order, nil
+}
+
+func (order *Order) DeleteOrderAndItems(db *gorm.DB, orderId uint) (*Order, error) {
+	if err := db.Preload("Items").First(&order, orderId).Error; err != nil {
+		return nil, err
+	}
+
+	db.Select("Items").Delete(&order)
 	return order, nil
 }

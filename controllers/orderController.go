@@ -24,50 +24,63 @@ func (server *Server) GetAllOrders(ctx *gin.Context) {
 	resSuccess(ctx, res, orders)
 }
 
-// func (server *Server) CreateOrder(ctx *gin.Context) {
-// 	var order models.Order
+func (server *Server) CreateOrder(ctx *gin.Context) {
+	var order *models.Order
+	var err error
+	var res = NewRequiredResponse()
 
-// 	if err := ctx.ShouldBindJSON(&order); err != nil {
-// 		resError(ctx, http.StatusBadRequest, extractBindError(err))
-// 		return
-// 	}
+	if err := ctx.ShouldBindJSON(&order); err != nil {
+		res.code = http.StatusBadRequest
+		res.message = "request validation errors"
+		resError(ctx, res, extractBindError(err))
+		return
+	}
 
-// 	if err := server.db.Create(&order).Error; err != nil {
-// 		resError(ctx, http.StatusBadRequest, err.Error())
-// 		return
-// 	}
+	order, err = order.CreateOrderAndItems(server.db)
+	if err != nil {
+		res.code = http.StatusBadRequest
+		res.message = err.Error()
+		resError(ctx, res, nil)
+		return
+	}
 
-// 	resSuccess(ctx, http.StatusCreated, order, "the order created successfully")
-// }
+	res.code = http.StatusCreated
+	res.message = "the order created successfully"
+	resSuccess(ctx, res, order)
+}
 
-// func (server *Server) UpdateOrderById(ctx *gin.Context) {
-// 	var order models.Order
-// 	var payloadOrder models.OrderUpdatePayload
-// 	var orderId = ctx.Param("orderId")
+func (server *Server) UpdateOrderById(ctx *gin.Context) {
+	var order *models.Order
+	var payloadOrder models.OrderUpdatePayload
+	var orderId = ctx.Param("orderId")
 
-// 	if err := ctx.ShouldBindJSON(&payloadOrder); err != nil {
-// 		resError(ctx, http.StatusBadRequest, extractBindError(err))
-// 		return
-// 	}
+	var res = NewRequiredResponse()
+	var parseOrderId, err = strconv.ParseUint(orderId, 10, 32)
+	if err != nil {
+		res.code = http.StatusBadRequest
+		res.message = "order id must be unsigned integer"
+		resError(ctx, res, nil)
+		return
+	}
 
-// 	if err := server.db.First(&order, orderId).Error; err != nil {
-// 		resError(ctx, http.StatusNotFound, err.Error())
-// 		return
-// 	}
+	if err := ctx.ShouldBindJSON(&payloadOrder); err != nil {
+		res.code = http.StatusBadRequest
+		res.message = "request validation errors"
+		resError(ctx, res, extractBindError(err))
+		return
+	}
 
-// 	order.CustomerName = payloadOrder.CustomerName
-// 	order.OrderedAt = payloadOrder.OrderedAt
+	order, err = order.UpdateOrderAndItems(server.db, uint(parseOrderId), payloadOrder)
+	if err != nil {
+		res.code = http.StatusNotFound
+		res.message = err.Error()
+		resError(ctx, res, nil)
+		return
+	}
 
-// 	server.db.Save(&order)
-
-// 	// for _, item := range payloadOrder.Items {
-// 	// 	server.db.Model(&models.Item{}).Where("item_id = ?", item.LineItemID).
-// 	// 		Where("order_id = ?", order.OrderID).
-// 	// 		Updates(item)
-// 	// }
-
-// 	resSuccess(ctx, http.StatusOK, order, "the order updated successfully")
-// }
+	res.message = "the order updated successfully"
+	resSuccess(ctx, res, order)
+}
 
 func (server *Server) DeleteOrderById(ctx *gin.Context) {
 	var order *models.Order
